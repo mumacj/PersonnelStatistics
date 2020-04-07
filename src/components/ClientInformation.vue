@@ -1,6 +1,37 @@
 <template>
   <div>
-    <el-table size="small" :data="tableData" height="570" stripe style="width: 100%">
+    <div style="margin-bottom:30px">
+      <el-row>
+        <!-- <el-col :span="12" align="center">
+          <span style="font-size:20px;"><b>起止时间：</b></span>
+          <el-date-picker
+            v-model="dateForSearch"
+            type="datetimerange"
+            align="right"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期"
+            :default-time="['12:00:00', '08:00:00']"
+          ></el-date-picker>
+        </el-col> -->
+        <el-col :span="6" align="center">
+          <span style="font-size:20px;"><b>姓名：</b></span>
+          <el-input v-model="name" placeholder="请输入内容" style="width:50%"></el-input>
+        </el-col>
+        <el-col :span="6" align="center">
+          <el-button
+            size="medium"
+            type="primary"
+            icon="el-icon-search"
+          >查询</el-button>
+          <el-button
+            size="medium"
+            type="warning"
+            icon="el-icon-circle-plus-outline"
+          >添加</el-button>
+        </el-col>
+      </el-row>
+    </div>
+    <el-table size="small" :data="tableData" height="54 0" stripe style="width: 100%">
       <el-table-column prop="date" label="注册日期" width="180" align="center"></el-table-column>
       <el-table-column prop="name" label="姓名" width="180" align="center"></el-table-column>
       <el-table-column prop="address" label="住户地址" align="center"></el-table-column>
@@ -30,6 +61,7 @@ export default {
   data() {
     return {
       dialogTableVisible: false,
+      name:"",
       tableData: [
         {
           date: "2016-05-02",
@@ -178,6 +210,5 @@ export default {
       });
     }
   },
-  mounted() {}
 };
 </script>

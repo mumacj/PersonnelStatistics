@@ -1,16 +1,47 @@
 <template>
   <div>
-    <el-table size="small" :data="tableData" height="570" stripe style="width: 100%">
-      <el-table-column prop="time" label="时间" width="200" align="center">
+    <div style="margin-bottom:30px">
+      <el-row>
+        <el-col :span="12" align="center">
+          <span style="font-size:20px;"><b>起止时间：</b></span>
+          <el-date-picker
+            v-model="dateForSearch"
+            type="datetimerange"
+            align="right"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期"
+            :default-time="['12:00:00', '08:00:00']"
+          ></el-date-picker>
+        </el-col>
+        <el-col :span="6" align="center">
+          <span style="font-size:20px;"><b>姓名：</b></span>
+          <el-input v-model="input" placeholder="请输入内容" style="width:50%"></el-input>
+        </el-col>
+        <el-col :span="6" align="center">
+          <el-button
+            size="medium"
+            type="primary"
+            icon="el-icon-search"
+          >查询</el-button>
+          <el-button
+            size="medium"
+            type="warning"
+            icon="el-icon-circle-plus-outline"
+          >添加</el-button>
+        </el-col>
+      </el-row>
+    </div>
+    <el-table size="small" :data="tableData" height="540" stripe style="width: 100%">
+      <el-table-column prop="time" label="时间" width="220" align="center">
         <template slot-scope="scope">
-          <el-time-picker
-            v-show="!scope.row.readonly"
+          <el-date-picker
             style="width:100%"
-            v-model="scope.row.dateTime"
+            type="datetime"
             placeholder="选择进入小区时间"
+            v-show="!scope.row.readonly"
+            v-model="scope.row.dateTime"
             :readonly="scope.row.readonly"
-          ></el-time-picker>
-
+          ></el-date-picker>
           <span v-show="scope.row.readonly" @dblclick="change(scope.row)">{{scope.row.time}}</span>
         </template>
       </el-table-column>
@@ -38,11 +69,19 @@
           <span v-show="scope.row.readonly" @dblclick="change(scope.row)">{{scope.row.tempNow}}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="wheLeave" label="是否离杭" align="center">
-
-      </el-table-column>
+      <el-table-column prop="wheLeave" label="是否离杭" align="center"></el-table-column>
       <el-table-column prop="healthMark" label="健康码" align="center">
-          
+        <template slot-scope="scope">
+          <el-switch
+            style="display: block;"
+            v-model="scope.row.healthMark"
+            active-color="#13ce66"
+            inactive-color="#ff4949"
+            active-text="健康"
+            inactive-text="待观察"
+            :disabled="scope.row.readonly"
+          ></el-switch>
+        </template>
       </el-table-column>
       <el-table-column label="操作" align="center" width="300">
         <template slot-scope="scope">
@@ -80,6 +119,8 @@
 export default {
   data() {
     return {
+      dateForSearch:"",
+      input: "",
       tableData: [
         {
           readonly: true,
@@ -90,13 +131,20 @@ export default {
           idCard: "339005123456789123",
           tempNow: "37.5",
           wheLeave: "否",
-          healthMark: "健康"
+          healthMark: true
         }
       ]
     };
   },
   methods: {
     formatDate(date) {
+      if (!date) {
+        this.$alert("请选择时间", "提示", {
+          confirmButtonText: "确定",
+        });
+
+        return;
+      }
       var h = date.getHours();
       var m = date.getMinutes();
       var s = date.getSeconds();
@@ -118,9 +166,7 @@ export default {
     },
     handleSave(index, row) {
       if (!row.readonly) {
-        
         row.time = this.formatDate(row.dateTime);
-          
       }
       row.readonly = true;
     },
