@@ -5,13 +5,9 @@
 
 <style scoped>
 .el-footer{
-  height: 100px !important;
+  height: 70px !important;
   background-color: #008b8b;
   color: beige;
-  text-align: left;
-  line-height: 100px;
-  font-size: 50px;
-  font-style: italic;
   font-family: cursive;
 }
 

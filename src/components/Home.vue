@@ -35,6 +35,7 @@
         <client-information v-if="this.index == 1"></client-information>
         <in-register v-else-if="this.index == 2"></in-register>
         <temp-general-view v-else-if="this.index == 3"></temp-general-view>
+        <new-pneumonia v-else-if="this.index == 4"></new-pneumonia>
       </el-main>
     </el-container>
 
@@ -48,6 +49,7 @@ import Footer from "@/components/Footer";
 import ClientInformation from "@/components/ClientInformation";
 import InRegister from "@/components/InRegister";
 import TempGeneralView from "@/components/TempGeneralView";
+import NewPneumonia from "@/components/NewPneumonia"
 export default {
   data() {
     return {
@@ -59,7 +61,8 @@ export default {
     footBtm: Footer,
     clientInformation: ClientInformation,
     inRegister: InRegister,
-    tempGeneralView: TempGeneralView
+    tempGeneralView: TempGeneralView,
+    newPneumonia: NewPneumonia
   },
   methods: {
     handleSelect(index, indexPath) {
