@@ -1,5 +1,6 @@
 <template>
     <el-header><span>小区人员流动管理系统</span>
+    <iframe width="280" scrolling="no" height="25" frameborder="0" allowtransparency="true" src="http://i.tianqi.com/index.php?c=code&id=34&icon=1&num=3"></iframe>
       <el-dropdown style="float:right">
         <el-button >
           <i

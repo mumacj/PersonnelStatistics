@@ -79,7 +79,6 @@
                 <br> <span style="padding-top:10px;color:rgb(78,90,101);font-size:30px;line-height:40px"><b>{{globalStatis.dead}}</b></span>
                 <br> 较昨日<span style="padding-top:10px;color:rgb(78,90,101);font-size:15px;"><b><span v-if="globalStatis.deadAdd > 0">+</span>{{globalStatis.deadAdd}}</b></span>
                 </el-card>
-                
           </el-col>
         </el-row>
         <el-row :gutter="10" style="margin-top:20px">
