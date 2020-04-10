@@ -1,6 +1,8 @@
 <template>
-    <el-header><span>小区人员流动管理系统</span>
-    <iframe width="280" scrolling="no" height="25" frameborder="0" allowtransparency="true" src="http://i.tianqi.com/index.php?c=code&id=34&icon=1&num=3"></iframe>
+    <el-header>
+      <span>小区人员流动管理系统</span>
+    <!-- <iframe width="280" scrolling="no" height="25" frameborder="0" allowtransparency="true" src="http://i.tianqi.com/index.php?c=code&id=34&icon=1&num=3"></iframe> -->
+    <iframe id="fancybox-frame" name="fancybox-frame1586483122250" height="70" frameborder="0" scrolling="no" hspace="0"  src="http://i.tianqi.com/index.php?c=code&a=getcode&id=38&h=60&w=610&py=xiaoshan"></iframe>
       <el-dropdown style="float:right">
         <el-button >
           <i

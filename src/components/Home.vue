@@ -5,7 +5,7 @@
       <el-aside>
         <el-menu
           style="height:700px;background-color:#e2e2e2"
-          default-active="2"
+          default-active="1"
           class="el-menu-vertical-demo"
           @select="handleSelect"
         >
@@ -36,6 +36,7 @@
         <in-register v-else-if="this.index == 2"></in-register>
         <temp-general-view v-else-if="this.index == 3"></temp-general-view>
         <new-pneumonia v-else-if="this.index == 4"></new-pneumonia>
+        <suggestion v-else-if="this.index == 5"></suggestion>
       </el-main>
     </el-container>
 
@@ -50,10 +51,12 @@ import ClientInformation from "@/components/ClientInformation";
 import InRegister from "@/components/InRegister";
 import TempGeneralView from "@/components/TempGeneralView";
 import NewPneumonia from "@/components/NewPneumonia"
+import Suggestion from "@/components/Suggestion"
+
 export default {
   data() {
     return {
-      index: 0
+      index: 1
     };
   },
   components: {
@@ -62,7 +65,8 @@ export default {
     clientInformation: ClientInformation,
     inRegister: InRegister,
     tempGeneralView: TempGeneralView,
-    newPneumonia: NewPneumonia
+    newPneumonia: NewPneumonia,
+    suggestion: Suggestion
   },
   methods: {
     handleSelect(index, indexPath) {
