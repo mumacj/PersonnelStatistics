@@ -15,31 +15,38 @@
         </el-col> -->
         <el-col :span="6" align="center">
           <span style="font-size:20px;"><b>姓名：</b></span>
-          <el-input v-model="name" placeholder="请输入内容" style="width:50%"></el-input>
+          <el-input v-model="username" placeholder="请输入姓名" style="width:50%"></el-input>
+        </el-col>
+        <el-col :span="6" align="center">
+          <span style="font-size:20px;"><b>身份证号：</b></span>
+          <el-input v-model="idcard" placeholder="请输入身份证号" style="width:50%"></el-input>
         </el-col>
         <el-col :span="6" align="center">
           <el-button
             size="medium"
             type="primary"
             icon="el-icon-search"
+            @click="search"
           >查询</el-button>
           <el-button
             size="medium"
             type="warning"
             icon="el-icon-circle-plus-outline"
+            @click="add"
           >添加</el-button>
         </el-col>
       </el-row>
     </div>
     <el-table size="small" :data="tableData" height="54 0" stripe style="width: 100%">
-      <el-table-column prop="date" label="注册日期" width="180" align="center"></el-table-column>
-      <el-table-column prop="name" label="姓名" width="180" align="center"></el-table-column>
+      <el-table-column prop="registe_date" label="注册日期" width="180" align="center"></el-table-column>
+      <el-table-column prop="id_card" label="身份证号" width="180" align="center"></el-table-column>
+      <el-table-column prop="username" label="姓名" width="180" align="center"></el-table-column>
       <el-table-column prop="address" label="住户地址" align="center"></el-table-column>
-      <el-table-column prop="inTimes" label="出入小区/次" align="center"></el-table-column>
+      <el-table-column prop="in_times" label="出入小区/次" align="center"></el-table-column>
       <el-table-column label="操作" align="center">
         <template slot-scope="scope">
           <el-button size="mini" type="primary" @click="handleCheck(scope.$index, scope.row)">查看</el-button>
-          <el-button size="mini" type="warning" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+          <!-- <el-button size="mini" type="warning" @click="handleEdit(scope.$index, scope.row)">编辑</el-button> -->
         </template>
       </el-table-column>
     </el-table>
@@ -61,7 +68,8 @@ export default {
   data() {
     return {
       dialogTableVisible: false,
-      name:"",
+      username:"",
+      idcard:"",
       tableData: [
         {
           date: "2016-05-02",
@@ -196,8 +204,14 @@ export default {
       this.dialogTableVisible = true;
       console.log(index);
       console.log(row);
-      this.option.title.text = row.name + "体温情况";
-      this.option.series[0].name = row.name;
+      this.option.title.text = row.username + "体温情况";
+      this.option.series[0].name = row.username;
+      this.$axios
+        .get("http://localhost:8880/getUserInfo/getAllUsers")
+        .then(resp => {
+          console.log(resp.data);
+          that.tableData = resp.data
+        })
     },
     handleDelete(index, row) {},
     drawLine() {
@@ -208,7 +222,32 @@ export default {
       this.$nextTick(() => {
         this.drawLine();
       });
+    },
+    search(){
+      var that = this;
+      var data = {
+        username:this.username,
+        idcard: this.idcard
+        };
+      this.$axios
+        .post("http://localhost:8880/getUserInfo/getUserByUsernameOrId",data)
+        .then(resp => {
+          console.log(resp.data);
+          that.tableData = resp.data
+        })
+    },
+    add(){
+
     }
   },
+  created(){
+    var that = this;
+     this.$axios
+        .get("http://localhost:8880/getUserInfo/getAllUsers")
+        .then(resp => {
+          console.log(resp.data);
+          that.tableData = resp.data
+        })
+  }
 };
 </script>
