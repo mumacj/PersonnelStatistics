@@ -202,14 +202,11 @@ export default {
   methods: {
     handleCheck(index, row) {
       this.dialogTableVisible = true;
-      console.log(index);
-      console.log(row);
       this.option.title.text = row.username + "体温情况";
       this.option.series[0].name = row.username;
       this.$axios
         .get("http://localhost:8880/getUserInfo/getAllUsers")
         .then(resp => {
-          console.log(resp.data);
           that.tableData = resp.data
         })
     },
@@ -232,7 +229,6 @@ export default {
       this.$axios
         .post("http://localhost:8880/getUserInfo/getUserByUsernameOrId",data)
         .then(resp => {
-          console.log(resp.data);
           that.tableData = resp.data
         })
     },
@@ -245,7 +241,6 @@ export default {
      this.$axios
         .get("http://localhost:8880/getUserInfo/getAllUsers")
         .then(resp => {
-          console.log(resp.data);
           that.tableData = resp.data
         })
   }

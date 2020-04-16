@@ -19,10 +19,10 @@
           <span style="font-size:20px;">
             <b>姓名：</b>
           </span>
-          <el-input v-model="input" placeholder="请输入内容" style="width:50%"></el-input>
+          <el-input v-model="name" placeholder="请输入姓名" style="width:50%"></el-input>
         </el-col>
         <el-col :span="6" align="center">
-          <el-button size="medium" type="primary" icon="el-icon-search">查询</el-button>
+          <el-button size="medium" type="primary" icon="el-icon-search" @click="search">查询</el-button>
           <el-button size="medium" type="warning" icon="el-icon-circle-plus-outline" @click="add">添加</el-button>
         </el-col>
 
@@ -180,19 +180,9 @@ export default {
       sizeForm: {},
       dialogFormVisible: false,
       dateForSearch: "",
-      input: "",
+      name: "",
       tableData: [
-        {
-          readonly: true,
-          dateTime: "",
-          time: "8:20:30",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1516 弄",
-          idCard: "339005123456789123",
-          tempNow: "37.5",
-          wheLeave: "否",
-          healthCode: true
-        }
+        
       ]
     };
   },
@@ -240,8 +230,32 @@ export default {
         row.time = this.formatDate(row.dateTime);
       }
       row.readonly = true;
+
+      var that = this
+      var data  = row;
+      this.$axios
+        .post("http://localhost:8880/getInInfo/updateInfo",data)
+        .then(resp => {
+          if(resp.data){
+            alert("保存成功");
+          }else{
+            alert("保存失败");
+          }
+        })
     },
-    handleDelete() {},
+    handleDelete(index, row) {
+      var that = this
+      this.$axios
+        .post("http://localhost:8880/getInInfo/deleteInfo/"+row.id)
+        .then(resp => {
+          if(resp){
+            that.tableData.splice(index,1);
+            alert("删除成功")
+          }else{
+            alert("删除失败")
+          }
+        })
+    },
     change(row) {
       row.readonly = false;
     },
@@ -257,20 +271,35 @@ export default {
           if(resp.data){
             that.sizeForm = {};
             that.dialogFormVisible = false;
+            that.getInfos();
           }
         })
     },
-  },
-  created(){
-    var that = this
-    this.$axios
+    search(){
+      var data = {
+        date:this.dateForSearch,
+        name:this.name
+      }
+      var that = this;
+      this.$axios
+        .post("http://localhost:8880/getInInfo/getInfosByTimeOrName",data)
+        .then(resp => {
+          that.tableData = resp.data;
+        })
+    },
+    getInfos(){
+      var that = this
+      this.$axios
         .get("http://localhost:8880/getInInfo/getInfos")
         .then(resp => {
           if(resp.data){
-            console.log(resp.data)
             that.tableData = resp.data
           }
         })
+    }
+  },
+  created(){
+    this.getInfos();
   }
 };
 </script>
