@@ -12,28 +12,22 @@
             end-placeholder="结束日期"
             :default-time="['12:00:00', '08:00:00']"
           ></el-date-picker>
-        </el-col> -->
+        </el-col>-->
         <el-col :span="6" align="center">
-          <span style="font-size:20px;"><b>姓名：</b></span>
+          <span style="font-size:20px;">
+            <b>姓名：</b>
+          </span>
           <el-input v-model="username" placeholder="请输入姓名" style="width:50%"></el-input>
         </el-col>
         <el-col :span="6" align="center">
-          <span style="font-size:20px;"><b>身份证号：</b></span>
+          <span style="font-size:20px;">
+            <b>身份证号：</b>
+          </span>
           <el-input v-model="idcard" placeholder="请输入身份证号" style="width:50%"></el-input>
         </el-col>
         <el-col :span="6" align="center">
-          <el-button
-            size="medium"
-            type="primary"
-            icon="el-icon-search"
-            @click="search"
-          >查询</el-button>
-          <el-button
-            size="medium"
-            type="warning"
-            icon="el-icon-circle-plus-outline"
-            @click="add"
-          >添加</el-button>
+          <el-button size="medium" type="primary" icon="el-icon-search" @click="search">查询</el-button>
+          <el-button size="medium" type="warning" icon="el-icon-circle-plus-outline" @click="add">添加</el-button>
         </el-col>
       </el-row>
     </div>
@@ -68,76 +62,9 @@ export default {
   data() {
     return {
       dialogTableVisible: false,
-      username:"",
-      idcard:"",
-      tableData: [
-        {
-          date: "2016-05-02",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1518 弄",
-          inTimes:6
-        },
-        {
-          date: "2016-05-04",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1517 弄",
-          inTimes:6
-        },
-        {
-          date: "2016-05-01",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1519 弄",
-          inTimes:6
-        },
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1516 弄",
-          inTimes:6
-        },
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1516 弄",
-          inTimes:6
-        },
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1516 弄",
-          inTimes:6
-        },
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1516 弄",
-          inTimes:5
-        },
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1516 弄",
-          inTimes:5
-        },
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1516 弄",
-          inTimes:5
-        },
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1516 弄",
-          inTimes:5
-        },
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1516 弄",
-          inTimes:5
-        }
-      ],
+      username: "",
+      idcard: "",
+      tableData: [],
       option: {
         title: {
           show: true,
@@ -160,7 +87,7 @@ export default {
         },
         yAxis: {
           type: "value",
-          name: "体温/℃", 
+          name: "体温/℃",
           nameTextStyle: {
             fontWeight: 600,
             fontSize: 18
@@ -201,14 +128,44 @@ export default {
   },
   methods: {
     handleCheck(index, row) {
+      var that = this;
       this.dialogTableVisible = true;
       this.option.title.text = row.username + "体温情况";
       this.option.series[0].name = row.username;
       this.$axios
-        .get("http://localhost:8880/getUserInfo/getAllUsers")
+        .get("http://localhost:8880/getInInfo/getTemps/" + row.id_card)
         .then(resp => {
-          that.tableData = resp.data
-        })
+          console.log(resp.data)
+          var dataArr = resp.data;
+          var chartsData = [];
+          for(var index in dataArr){
+            var item = [];
+            console.log(dataArr[index])
+            item.push(dataArr[index].in_time);
+            item.push(dataArr[index].temperature);
+            chartsData.push(item)
+          }
+          echarts.init(this.$refs.charts).setOption({
+            series: [
+              {
+                symbol: "circle",
+                symbolSize: 10,
+                name: "",
+                data: chartsData,
+                type: "line",
+                itemStyle: {
+                  normal: {
+                    color: "#F56C6C",
+                    lineStyle: {
+                      color: "#40C6FF",
+                      width: 5
+                    }
+                  }
+                }
+              }
+            ]
+          });
+        });
     },
     handleDelete(index, row) {},
     drawLine() {
@@ -220,29 +177,27 @@ export default {
         this.drawLine();
       });
     },
-    search(){
+    search() {
       var that = this;
       var data = {
-        username:this.username,
+        username: this.username,
         idcard: this.idcard
-        };
+      };
       this.$axios
-        .post("http://localhost:8880/getUserInfo/getUserByUsernameOrId",data)
+        .post("http://localhost:8880/getUserInfo/getUserByUsernameOrId", data)
         .then(resp => {
-          that.tableData = resp.data
-        })
+          that.tableData = resp.data;
+        });
     },
-    add(){
-
-    }
+    add() {}
   },
-  created(){
+  created() {
     var that = this;
-     this.$axios
-        .get("http://localhost:8880/getUserInfo/getAllUsers")
-        .then(resp => {
-          that.tableData = resp.data
-        })
+    this.$axios
+      .get("http://localhost:8880/getUserInfo/getAllUsers")
+      .then(resp => {
+        that.tableData = resp.data;
+      });
   }
 };
 </script>
