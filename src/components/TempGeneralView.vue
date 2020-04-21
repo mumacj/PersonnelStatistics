@@ -38,16 +38,15 @@ export default {
             fontSize: 18
           },
           min: "35.5",
-          max: "38.5",
-          
+          max: "38.5"
         },
         visualMap: {
-            show: false,
+          show: false,
           type: "piecewise",
           pieces: [
-            { min: 37.3,max:38.5 , color:"#F56C6C" }, 
-            { min: 36.0, max: 37.2, color:"#67C23A" },
-            { min: 35.5, max: 35.9, color:"#409EFF" }
+            { min: 37.3, max: 38.5, color: "#F56C6C" },
+            { min: 36.0, max: 37.2, color: "#67C23A" },
+            { min: 35.5, max: 35.9, color: "#409EFF" }
           ]
         },
         tooltip: { trigger: "axis" },
@@ -56,29 +55,7 @@ export default {
             symbol: "circle",
             symbolSize: 10,
             name: "",
-            data: [
-              ["2020/4/9 8:00", 35.5],
-              ["2020/4/9 8:01", 36.9],
-              ["2020/4/9 8:02", 37.5],
-              ["2020/4/9 8:03", 38.1],
-              ["2020/4/9 8:04", 36.3],
-              ["2020/4/9 8:05", 36.9],
-              ["2020/4/9 8:06", 37.24],
-              ["2020/4/9 8:07", 36.26],
-              ["2020/4/9 8:08", 36.84],
-              ["2020/4/9 8:09", 37.22],
-              ["2020/4/9 8:10", 36.68],
-              ["2020/4/9 9:10", 36.6],
-              ["2020/4/9 10:10", 36.8],
-              ["2020/4/9 12:10", 35.68],
-              ["2020/4/9 13:10", 37.68],
-              ["2020/4/9 4:10", 36.3],
-              ["2020/4/9 3:10", 36.2],
-              ["2020/4/9 2:10", 36.5],
-              ["2020/4/9 19:10", 36.4],
-              ["2020/4/9 20:10", 36.7],
-              ["2020/4/9 22:10", 36.9]
-            ],
+            data: [],
             type: "scatter",
             itemStyle: {
               normal: {
@@ -149,12 +126,109 @@ export default {
       myChart.setOption(this.option);
       let myChart2 = echarts.init(this.$refs.charts2);
       myChart2.setOption(this.option2);
+    },
+    //时间格式化函数
+    renderTime(date) {
+      var dateee = new Date(date).toJSON();
+      return new Date(+new Date(dateee) + 8 * 3600 * 1000)
+        .toISOString()
+        .replace(/T/g, " ")
+        .replace(/\.[\d]{3}Z/, "");
+    },
+    getInfos() {
+      var that = this;
+      this.$axios
+        .get("http://localhost:8880/getInInfo/getDailyTempInfo")
+        .then(resp => {
+          if (resp.data) {
+            console.log(resp.data);
+            var pieData = resp.data.pieData;
+            echarts.init(this.$refs.charts).setOption({
+              series: [
+                {
+                  name: "体温状况",
+                  type: "pie",
+                  hoverAnimation: true,
+                  radius: ["20%", "70%"],
+                  center: ["50%", "50%"],
+                  data: [
+                    {
+                      value: pieData.health,
+                      name: "体温正常",
+                      itemStyle: { color: "#67C23A" }
+                    },
+                    {
+                      value: pieData.high,
+                      name: "体温偏高",
+                      itemStyle: { color: "#F56C6C" }
+                    },
+                    {
+                      value: pieData.low,
+                      name: "体温偏低",
+                      itemStyle: { color: "#409EFF" }
+                    }
+                  ].sort(function(a, b) {
+                    return a.value - b.value;
+                  }),
+                  roseType: "radius",
+                  label: {
+                    fontSize: 15,
+                    fontWeight: "bold"
+                  },
+                  labelLine: {
+                    smooth: 0.2,
+                    length: 30,
+                    length2: 20
+                  },
+
+                  animationType: "scale",
+                  animationEasing: "bounceOut",
+                  animationDelay: function(idx) {
+                    return Math.random() * 200;
+                  }
+                }
+              ]
+            });
+
+            var dataArr = resp.data.tempData;
+            var chartsData = [];
+            for (var index in dataArr) {
+              var item = [];
+              item.push(that.renderTime(dataArr[index].in_time));
+              item.push(dataArr[index].temperature);
+              chartsData.push(item);
+            }
+            echarts.init(this.$refs.charts2).setOption({
+              series: [
+                {
+                  symbol: "circle",
+                  symbolSize: 10,
+                  name: "",
+                  data: chartsData,
+                  type: "scatter",
+                  itemStyle: {
+                    normal: {
+                      color: "#F56C6C",
+                      lineStyle: {
+                        color: "#40C6FF",
+                        width: 5
+                      }
+                    }
+                  }
+                }
+              ]
+            });
+          }
+        });
     }
   },
   mounted() {
     this.$nextTick(() => {
       this.drawLine();
     });
+  },
+  created() {
+    this.getInfos();
   }
 };
 </script>
