@@ -93,9 +93,7 @@ export default {
             radius: ["20%", "70%"],
             center: ["50%", "50%"],
             data: [
-              { value: 100, name: "体温正常", itemStyle: { color: "#67C23A" } },
-              { value: 5, name: "体温偏高", itemStyle: { color: "#F56C6C" } },
-              { value: 20, name: "体温偏低", itemStyle: { color: "#409EFF" } }
+              
             ].sort(function(a, b) {
               return a.value - b.value;
             }),

@@ -2,17 +2,6 @@
   <div>
     <div style="margin-bottom:30px">
       <el-row>
-        <!-- <el-col :span="12" align="center">
-          <span style="font-size:20px;"><b>起止时间：</b></span>
-          <el-date-picker
-            v-model="dateForSearch"
-            type="datetimerange"
-            align="right"
-            start-placeholder="开始日期"
-            end-placeholder="结束日期"
-            :default-time="['12:00:00', '08:00:00']"
-          ></el-date-picker>
-        </el-col>-->
         <el-col :span="6" align="center">
           <span style="font-size:20px;">
             <b>姓名：</b>
@@ -29,9 +18,45 @@
           <el-button size="medium" type="primary" icon="el-icon-search" @click="search">查询</el-button>
           <el-button size="medium" type="warning" icon="el-icon-circle-plus-outline" @click="add">添加</el-button>
         </el-col>
+        <!-- 添加记录 -->
+        <el-dialog title="添加记录" :visible.sync="dialogFormVisible" align="center">
+          <el-form
+            ref="form"
+            :model="sizeForm"
+            label-width="80px"
+            size="small"
+            style="width:50%"
+            label-position="left"
+            align="left"
+          >
+            <el-form-item label="注册日期">
+              <el-col :span="11">
+                <el-date-picker
+                  type="date"
+                  placeholder="选择日期"
+                  v-model="sizeForm.date"
+                  style="width: 100%;"
+                ></el-date-picker>
+              </el-col>
+            </el-form-item>
+            <el-form-item label="证件号">
+              <el-input v-model="sizeForm.idCard" style="width:50%"></el-input>
+            </el-form-item>
+            <el-form-item label="姓名">
+              <el-input v-model="sizeForm.name" style="width:50%"></el-input>
+            </el-form-item>
+            <el-form-item label="住户地址">
+              <el-input v-model="sizeForm.address" style="width:80%"></el-input>
+            </el-form-item>
+            <el-form-item size="large">
+              <el-button type="primary" @click="onSubmit">保存</el-button>
+              <el-button @click="dialogFormVisible = false">取消</el-button>
+            </el-form-item>
+          </el-form>
+        </el-dialog>
       </el-row>
     </div>
-    <el-table size="small" :data="tableData" height="54 0" stripe style="width: 100%">
+    <el-table size="small" :data="tableData" height="540" stripe style="width: 100%">
       <el-table-column prop="registe_date" label="注册日期" width="180" align="center"></el-table-column>
       <el-table-column prop="id_card" label="身份证号" width="180" align="center"></el-table-column>
       <el-table-column prop="username" label="姓名" width="180" align="center"></el-table-column>
@@ -61,6 +86,8 @@ var echarts = require("echarts");
 export default {
   data() {
     return {
+      sizeForm: {},
+      dialogFormVisible: false,
       dialogTableVisible: false,
       username: "",
       idcard: "",
@@ -102,15 +129,7 @@ export default {
             symbol: "circle",
             symbolSize: 10,
             name: "",
-            data: [
-              ["2020/4/1", 35.5],
-              ["2020/4/2", 36.8],
-              ["2020/4/3", 36.4],
-              ["2020/4/4", 36.5],
-              ["2020/4/5", 37.0],
-              ["2020/4/6", 37.5],
-              ["2020/4/7", 38.3]
-            ],
+            data: [],
             type: "line",
             itemStyle: {
               normal: {
@@ -135,15 +154,15 @@ export default {
       this.$axios
         .get("http://localhost:8880/getInInfo/getTemps/" + row.id_card)
         .then(resp => {
-          console.log(resp.data)
+          console.log(resp.data);
           var dataArr = resp.data;
           var chartsData = [];
-          for(var index in dataArr){
+          for (var index in dataArr) {
             var item = [];
-            console.log(dataArr[index])
+            console.log(dataArr[index]);
             item.push(dataArr[index].in_time);
             item.push(dataArr[index].temperature);
-            chartsData.push(item)
+            chartsData.push(item);
           }
           echarts.init(this.$refs.charts).setOption({
             series: [
@@ -189,15 +208,33 @@ export default {
           that.tableData = resp.data;
         });
     },
-    add() {}
+    add() {
+      this.dialogFormVisible = true;
+    },
+    onSubmit() {
+      var data = this.sizeForm;
+      var that = this;
+      this.$axios
+        .post("http://localhost:8880/getUserInfo/addUser", data)
+        .then(resp => {
+          if (resp.data) {
+            that.sizeForm = {};
+            that.dialogFormVisible = false;
+            that.getInfos();
+          }
+        });
+    },
+    getInfos() {
+      var that = this;
+      this.$axios
+        .get("http://localhost:8880/getUserInfo/getAllUsers")
+        .then(resp => {
+          that.tableData = resp.data;
+        });
+    }
   },
   created() {
-    var that = this;
-    this.$axios
-      .get("http://localhost:8880/getUserInfo/getAllUsers")
-      .then(resp => {
-        that.tableData = resp.data;
-      });
+    this.getInfos()
   }
 };
 </script>
