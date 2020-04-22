@@ -234,7 +234,7 @@ export default {
     }
   },
   created() {
-    this.getInfos()
+    this.getInfos();
   }
 };
 </script>

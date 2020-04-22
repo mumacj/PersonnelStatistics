@@ -38,7 +38,13 @@
             align="left"
           >
             <el-form-item label="证件号">
-              <el-input v-model="sizeForm.idCard" style="width:50%"></el-input>
+              <el-autocomplete
+                class="inline-input"
+                v-model="sizeForm.idCard"
+                :fetch-suggestions="querySearch"
+                :trigger-on-focus="false"
+                @select="handleSelect"
+              ></el-autocomplete>
             </el-form-item>
             <el-form-item label="姓名">
               <el-input v-model="sizeForm.name" style="width:50%"></el-input>
@@ -177,13 +183,12 @@
 export default {
   data() {
     return {
+      results:[],
       sizeForm: {},
       dialogFormVisible: false,
       dateForSearch: "",
       name: "",
-      tableData: [
-        
-      ]
+      tableData: []
     };
   },
   methods: {
@@ -195,8 +200,8 @@ export default {
 
         return;
       }
-      date = new Date(date)
-      console.log(date)
+      date = new Date(date);
+      console.log(date);
       var y = date.getFullYear();
       var M = date.getMonth() + 1;
       var d = date.getDate();
@@ -219,7 +224,7 @@ export default {
       if (s < 10) {
         s = "0" + s;
       }
-      return y+"-"+ M +"-" + d+" " + h + ":" + m + ":" + s;
+      return y + "-" + M + "-" + d + " " + h + ":" + m + ":" + s;
     },
     handleEdit(index, row) {
       row.readonly = false;
@@ -231,30 +236,30 @@ export default {
       }
       row.readonly = true;
 
-      var that = this
-      var data  = row;
+      var that = this;
+      var data = row;
       this.$axios
-        .post("http://localhost:8880/getInInfo/updateInfo",data)
+        .post("http://localhost:8880/getInInfo/updateInfo", data)
         .then(resp => {
-          if(resp.data){
+          if (resp.data) {
             alert("保存成功");
-          }else{
+          } else {
             alert("保存失败");
           }
-        })
+        });
     },
     handleDelete(index, row) {
-      var that = this
+      var that = this;
       this.$axios
-        .post("http://localhost:8880/getInInfo/deleteInfo/"+row.id)
+        .post("http://localhost:8880/getInInfo/deleteInfo/" + row.id)
         .then(resp => {
-          if(resp){
-            that.tableData.splice(index,1);
-            alert("删除成功")
-          }else{
-            alert("删除失败")
+          if (resp) {
+            that.tableData.splice(index, 1);
+            alert("删除成功");
+          } else {
+            alert("删除失败");
           }
-        })
+        });
     },
     change(row) {
       row.readonly = false;
@@ -262,43 +267,59 @@ export default {
     add() {
       this.dialogFormVisible = true;
     },
-    onSubmit(){
+    onSubmit() {
       var data = this.sizeForm;
       var that = this;
       this.$axios
-        .post("http://localhost:8880/getInInfo/addInfo",data)
+        .post("http://localhost:8880/getInInfo/addInfo", data)
         .then(resp => {
-          if(resp.data){
+          if (resp.data) {
             that.sizeForm = {};
             that.dialogFormVisible = false;
             that.getInfos();
           }
-        })
+        });
     },
-    search(){
+    search() {
       var data = {
-        date:this.dateForSearch,
-        name:this.name
-      }
+        date: this.dateForSearch,
+        name: this.name
+      };
       var that = this;
       this.$axios
-        .post("http://localhost:8880/getInInfo/getInfosByTimeOrName",data)
+        .post("http://localhost:8880/getInInfo/getInfosByTimeOrName", data)
         .then(resp => {
           that.tableData = resp.data;
-        })
+        });
     },
-    getInfos(){
-      var that = this
-      this.$axios
-        .get("http://localhost:8880/getInInfo/getInfos")
-        .then(resp => {
-          if(resp.data){
-            that.tableData = resp.data
-          }
-        })
+    getInfos() {
+      var that = this;
+      this.$axios.get("http://localhost:8880/getInInfo/getInfos").then(resp => {
+        if (resp.data) {
+          that.tableData = resp.data;
+        }
+      });
+    },
+    querySearch(queryString, cb){
+      var that = this;
+      var ids = [];
+      this.$axios.post("http://localhost:8880/getUserInfo/getInfosLikeId",{queryString:queryString}).then(resp => {
+        if (resp.data) {
+          that.results = resp.data;
+          // for(var index in that.results){
+          //   ids.add(that.results[index].id_card);
+          // }
+          cb(resp.data);
+        }
+      });
+      
+    },
+    handleSelect(item){
+      this.sizeForm.name = item.username;
+      this.sizeForm.address = item.address;
     }
   },
-  created(){
+  created() {
     this.getInfos();
   }
 };
