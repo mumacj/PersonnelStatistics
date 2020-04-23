@@ -171,8 +171,11 @@
       </el-table-column>
     </el-table>
     <el-pagination
+      @size-change="handleSizeChange"
+      @current-change="handleCurrentChange"
+      :current-page="currentPage"
       :page-sizes="[10, 20, 30, 40]"
-      :page-size="10"
+      :page-size="pageSize"
       layout="total, sizes, prev, pager, next, jumper"
       :total="400"
     ></el-pagination>
@@ -183,7 +186,9 @@
 export default {
   data() {
     return {
-      results:[],
+      pageSize: 10,
+      currentPage:1,
+      results: [],
       sizeForm: {},
       dialogFormVisible: false,
       dateForSearch: "",
@@ -292,35 +297,50 @@ export default {
           that.tableData = resp.data;
         });
     },
-    getInfos() {
+    getInfos(currentPage,size) {
+      var data = {
+        currentPage:currentPage,
+        size:size
+      } 
       var that = this;
-      this.$axios.get("http://localhost:8880/getInInfo/getInfos").then(resp => {
+      this.$axios.post("http://localhost:8880/getInInfo/getInfos",data).then(resp => {
         if (resp.data) {
           that.tableData = resp.data;
         }
       });
     },
-    querySearch(queryString, cb){
+    querySearch(queryString, cb) {
       var that = this;
       var ids = [];
-      this.$axios.post("http://localhost:8880/getUserInfo/getInfosLikeId",{queryString:queryString}).then(resp => {
-        if (resp.data) {
-          that.results = resp.data;
-          // for(var index in that.results){
-          //   ids.add(that.results[index].id_card);
-          // }
-          cb(resp.data);
-        }
-      });
-      
+      this.$axios
+        .post("http://localhost:8880/getUserInfo/getInfosLikeId", {
+          queryString: queryString
+        })
+        .then(resp => {
+          if (resp.data) {
+            that.results = resp.data;
+            // for(var index in that.results){
+            //   ids.add(that.results[index].id_card);
+            // }
+            cb(resp.data);
+          }
+        });
     },
-    handleSelect(item){
+    handleSelect(item) {
       this.sizeForm.name = item.username;
       this.sizeForm.address = item.address;
+    },
+    handleCurrentChange(val) {
+      //请求
+      this.getInfos(val,this.pageSize);
+    },
+    handleSizeChange(val) {
+      //请求
+      this.getInfos(1,this.pageSize);
     }
   },
   created() {
-    this.getInfos();
+    this.getInfos(1,10);
   }
 };
 </script>

@@ -79,7 +79,12 @@ export default {
     submitForm(formName) {
       this.$refs[formName].validate(valid => {
         if (valid) {
-          this.$router.push({ path: "/home" });
+          if(this.ruleForm.username == "admin" && this.ruleForm.password == "admin"){
+            this.$router.push({ path: "/home" });
+          }else{
+            alert("用户名或密码错误");
+          }
+          
         } else {
           console.log("error submit!!");
           return false;
